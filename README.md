@@ -16,8 +16,6 @@ Subsurface simulation is a critical aspect of understanding geological formation
 
 ## Getting Started
 
-To get started with this eLearning platform, follow these steps:
-
-1. **Clone the Repository**: Download the repository to your local machine.
+To get started with this eLearning platform, follow me to the future of Sub Surface Ai.
    ```bash
-   git clone https://github.com/<your-username>/subsurface-simulation-elearning.git
+   g
