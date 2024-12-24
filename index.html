@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoLearn - Interactive Geology Learning Platform</title>
+    <title>RockPhysics Hub - Interactive Learning Platform</title>
     <style>
         * {
             margin: 0;
@@ -11,50 +11,86 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #0d47a1;
+            --accent-color: #2962ff;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+            --background-light: #f5f5f5;
+        }
+
         body {
             font-family: Arial, sans-serif;
             overflow-x: hidden;
         }
 
+        /* Header Styles */
         .header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             height: 60px;
-            background-color: #2c3e50;
-            color: white;
+            background-color: var(--primary-color);
+            color: var(--text-light);
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 0 20px;
             z-index: 1000;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .menu-toggle {
-            background: none;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-bar {
+            padding: 8px 15px;
+            border-radius: 20px;
             border: none;
-            color: white;
-            font-size: 24px;
+            width: 250px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             cursor: pointer;
-            margin-right: 20px;
-            display: none;
         }
 
-        .header-title {
-            font-size: 1.5em;
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
 
+        /* Main Container Styles */
         .main-container {
             display: flex;
             margin-top: 60px;
             min-height: calc(100vh - 60px);
         }
 
+        /* Sidebar Styles */
         .sidebar {
             width: 300px;
-            background-color: #2c3e50;
-            color: white;
+            background-color: var(--secondary-color);
+            color: var(--text-light);
             padding: 20px;
             overflow-y: auto;
             height: calc(100vh - 60px);
@@ -63,13 +99,38 @@
             transition: transform 0.3s ease;
         }
 
+        .progress-bar {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .progress-title {
+            margin-bottom: 10px;
+        }
+
+        .progress-track {
+            background-color: rgba(255, 255, 255, 0.2);
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: var(--accent-color);
+            height: 100%;
+            width: 45%;
+            transition: width 0.3s ease;
+        }
+
         .menu-section {
             margin: 20px 0;
         }
 
         .menu-title {
             font-size: 1.2em;
-            color: #3498db;
+            color: var(--accent-color);
             margin-bottom: 10px;
         }
 
@@ -83,16 +144,23 @@
             transition: background-color 0.3s;
             border-radius: 5px;
             margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .menu-item:hover {
-            background-color: #34495e;
+        .completion-badge {
+            background-color: var(--accent-color);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
         }
 
+        /* Content Styles */
         .content {
             flex-grow: 1;
             padding: 20px;
-            background-color: #ecf0f1;
+            background-color: var(--background-light);
             margin-left: 300px;
             min-height: calc(100vh - 60px);
             transition: margin-left 0.3s ease;
@@ -106,10 +174,20 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-        .simulation-title {
-            font-size: 1.5em;
-            color: #2c3e50;
+        .simulation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+        }
+
+        .download-resources {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
         }
 
         .simulation-content {
@@ -118,28 +196,37 @@
             gap: 20px;
         }
 
-        .simulation-image {
-            width: 100%;
-            height: 300px;
-            background-color: #bdc3c7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .interactive-area {
+            background-color: var(--background-light);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .control-button {
+            padding: 10px;
+            border: none;
             border-radius: 5px;
-        }
-
-        .simulation-description {
-            line-height: 1.6;
-        }
-
-        .active {
-            background-color: #3498db;
+            background-color: var(--secondary-color);
+            color: white;
+            cursor: pointer;
         }
 
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             .menu-toggle {
                 display: block;
+            }
+
+            .search-bar {
+                display: none;
             }
 
             .sidebar {
@@ -156,11 +243,6 @@
                 width: 100%;
             }
 
-            .simulation-image {
-                height: 200px;
-            }
-
-            /* Overlay when sidebar is open */
             .overlay {
                 display: none;
                 position: fixed;
@@ -181,8 +263,17 @@
 <body>
     <!-- Header -->
     <header class="header">
-        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-        <h1 class="header-title">GeoLearn - Interactive Geology Learning</h1>
+        <div class="header-left">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <h1 class="header-title">RockPhysics Hub</h1>
+        </div>
+        <div class="header-right">
+            <input type="text" class="search-bar" placeholder="Search topics...">
+            <div class="user-menu" onclick="toggleUserMenu()">
+                <div class="user-avatar">U</div>
+                <span>User Name</span>
+            </div>
+        </div>
     </header>
 
     <!-- Main Container -->
@@ -192,31 +283,65 @@
 
         <!-- Sidebar -->
         <div class="sidebar">
+            <div class="progress-bar">
+                <div class="progress-title">Course Progress</div>
+                <div class="progress-track">
+                    <div class="progress-fill"></div>
+                </div>
+                <div style="margin-top: 5px; font-size: 0.9em;">45% Complete</div>
+            </div>
+
             <div class="menu-section">
-                <div class="menu-title">Basic Geology</div>
+                <div class="menu-title">Fundamentals</div>
                 <ul class="menu-items">
-                    <li class="menu-item active" onclick="showSimulation('rocks')">Rock Types</li>
-                    <li class="menu-item" onclick="showSimulation('minerals')">Mineral Identification</li>
-                    <li class="menu-item" onclick="showSimulation('plate-tectonics')">Plate Tectonics</li>
-                    <li class="menu-item" onclick="showSimulation('weathering')">Weathering & Erosion</li>
+                    <li class="menu-item" onclick="showSimulation('porosity')">
+                        <span>Porosity & Permeability</span>
+                        <span class="completion-badge">100%</span>
+                    </li>
+                    <li class="menu-item" onclick="showSimulation('elasticity')">
+                        <span>Rock Elasticity</span>
+                        <span class="completion-badge">75%</span>
+                    </li>
+                    <li class="menu-item" onclick="showSimulation('density')">
+                        <span>Density-Porosity Relations</span>
+                        <span class="completion-badge">0%</span>
+                    </li>
                 </ul>
             </div>
+
             <div class="menu-section">
-                <div class="menu-title">Intermediate Concepts</div>
+                <div class="menu-title">Petrophysical Properties</div>
                 <ul class="menu-items">
-                    <li class="menu-item" onclick="showSimulation('stratigraphy')">Stratigraphy</li>
-                    <li class="menu-item" onclick="showSimulation('structural')">Structural Geology</li>
-                    <li class="menu-item" onclick="showSimulation('geologic-time')">Geologic Time</li>
-                    <li class="menu-item" onclick="showSimulation('fossils')">Fossils & Dating</li>
+                    <li class="menu-item" onclick="showSimulation('velocity')">
+                        <span>Velocity Analysis</span>
+                        <span class="completion-badge">50%</span>
+                    </li>
+                    <li class="menu-item" onclick="showSimulation('saturation')">
+                        <span>Fluid Saturation</span>
+                        <span class="completion-badge">0%</span>
+                    </li>
+                    <li class="menu-item" onclick="showSimulation('pressure')">
+                        <span>Pore Pressure</span>
+                        <span class="completion-badge">0%</span>
+                    </li>
                 </ul>
             </div>
+
             <div class="menu-section">
                 <div class="menu-title">Advanced Topics</div>
                 <ul class="menu-items">
-                    <li class="menu-item" onclick="showSimulation('geophysics')">Geophysics</li>
-                    <li class="menu-item" onclick="showSimulation('petrology')">Advanced Petrology</li>
-                    <li class="menu-item" onclick="showSimulation('tectonics')">Advanced Tectonics</li>
-                    <li class="menu-item" onclick="showSimulation('resources')">Natural Resources</li>
+                    <li class="menu-item" onclick="showSimulation('avo')">
+                        <span>AVO Analysis</span>
+                        <span class="completion-badge">0%</span>
+                    </li>
+                    <li class="menu-item" onclick="showSimulation('anisotropy')">
+                        <span>Anisotropy</span>
+                        <span class="completion-badge">0%</span>
+                    </li>
+                    <li class="menu-item" onclick="showSimulation('gassmann')">
+                        <span>Gassmann Fluid Substitution</span>
+                        <span class="completion-badge">0%</span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -224,13 +349,22 @@
         <!-- Content Area -->
         <div class="content">
             <div class="simulation-container">
-                <h2 class="simulation-title">Rock Types</h2>
+                <div class="simulation-header">
+                    <h2 class="simulation-title">Porosity & Permeability</h2>
+                    <button class="download-resources">Download Resources</button>
+                </div>
                 <div class="simulation-content">
-                    <div class="simulation-image">
-                        <img src="/api/placeholder/800/400" alt="Simulation Area">
+                    <div class="interactive-area">
+                        <img src="/api/placeholder/800/400" alt="Interactive Simulation Area">
+                        <div class="controls">
+                            <button class="control-button">Adjust Porosity</button>
+                            <button class="control-button">Change Fluid Type</button>
+                            <button class="control-button">View Cross-section</button>
+                            <button class="control-button">Reset Simulation</button>
+                        </div>
                     </div>
                     <div class="simulation-description">
-                        <p>Click and drag to rotate the rock sample. Use the buttons below to identify different mineral components and learn about their formation processes.</p>
+                        <p>Interactive simulation demonstrating the relationship between porosity and permeability in reservoir rocks. Adjust parameters to see how they affect fluid flow and storage capacity.</p>
                     </div>
                 </div>
             </div>
@@ -238,53 +372,56 @@
     </div>
 
     <script>
+        // Toggle sidebar on mobile
         function toggleSidebar() {
             document.querySelector('.sidebar').classList.toggle('active');
             document.querySelector('.overlay').classList.toggle('active');
         }
 
-        function showSimulation(topic) {
-            // Remove active class from all menu items
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
-            });
+        // Toggle user menu dropdown
+        function toggleUserMenu() {
+            // Implementation for user menu dropdown
+            console.log('Toggle user menu');
+        }
 
-            // Add active class to clicked item
-            event.target.classList.add('active');
+        // Show different simulations
+        function showSimulation(topic) {
+            const titles = {
+                'porosity': 'Porosity & Permeability',
+                'elasticity': 'Rock Elasticity',
+                'density': 'Density-Porosity Relations',
+                'velocity': 'Velocity Analysis',
+                'saturation': 'Fluid Saturation',
+                'pressure': 'Pore Pressure',
+                'avo': 'AVO Analysis',
+                'anisotropy': 'Anisotropy',
+                'gassmann': 'Gassmann Fluid Substitution'
+            };
+
+            const descriptions = {
+                'porosity': 'Interactive simulation demonstrating the relationship between porosity and permeability in reservoir rocks. Adjust parameters to see how they affect fluid flow and storage capacity.',
+                'elasticity': 'Explore rock elastic properties and their response to stress and strain. Visualize how different rock types behave under various conditions.',
+                'density': 'Investigate the relationships between rock density and porosity, and how they impact reservoir properties.',
+                // Add descriptions for other topics
+            };
+
+            // Update content
+            document.querySelector('.simulation-title').textContent = titles[topic];
+            document.querySelector('.simulation-description p').textContent = 
+                descriptions[topic] || `Interactive simulation for ${titles[topic]}`;
 
             // Close sidebar on mobile after selection
             if (window.innerWidth <= 768) {
                 toggleSidebar();
             }
-
-            // Update simulation content based on topic
-            const titles = {
-                'rocks': 'Rock Types',
-                'minerals': 'Mineral Identification',
-                'plate-tectonics': 'Plate Tectonics',
-                'weathering': 'Weathering & Erosion',
-                'stratigraphy': 'Stratigraphy',
-                'structural': 'Structural Geology',
-                'geologic-time': 'Geologic Time',
-                'fossils': 'Fossils & Dating',
-                'geophysics': 'Geophysics',
-                'petrology': 'Advanced Petrology',
-                'tectonics': 'Advanced Tectonics',
-                'resources': 'Natural Resources'
-            };
-
-            const descriptions = {
-                'rocks': 'Click and drag to rotate the rock sample. Use the buttons below to identify different mineral components and learn about their formation processes.',
-                'minerals': 'Examine mineral properties including hardness, streak, and cleavage. Use the virtual tools to perform tests and identify unknown minerals.',
-                'plate-tectonics': 'Interact with this dynamic model of Earth\'s tectonic plates. Observe plate movements and their effects on geological features.',
-                'weathering': 'Simulate different weathering processes and their effects on various rock types over time.',
-                // Add descriptions for other topics as needed
-            };
-
-            document.querySelector('.simulation-title').textContent = titles[topic];
-            document.querySelector('.simulation-description p').textContent = 
-                descriptions[topic] || 'Interactive simulation content for ' + titles[topic];
         }
+
+        // Search functionality
+        document.querySelector('.search-bar').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Implement search logic here
+            console.log('Searching for:', searchTerm);
+        });
     </script>
 </body>
 </html>
