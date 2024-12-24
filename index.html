@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geology E-Learning Platform</title>
+    <title>GeoLearn - Interactive Geology Learning Platform</title>
     <style>
         * {
             margin: 0;
@@ -13,8 +13,42 @@
 
         body {
             font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: #2c3e50;
+            color: white;
             display: flex;
-            min-height: 100vh;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 20px;
+            display: none;
+        }
+
+        .header-title {
+            font-size: 1.5em;
+        }
+
+        .main-container {
+            display: flex;
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
         }
 
         .sidebar {
@@ -23,12 +57,10 @@
             color: white;
             padding: 20px;
             overflow-y: auto;
-        }
-
-        .logo {
-            text-align: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #34495e;
+            height: calc(100vh - 60px);
+            position: fixed;
+            left: 0;
+            transition: transform 0.3s ease;
         }
 
         .menu-section {
@@ -61,7 +93,9 @@
             flex-grow: 1;
             padding: 20px;
             background-color: #ecf0f1;
-            overflow-y: auto;
+            margin-left: 300px;
+            min-height: calc(100vh - 60px);
+            transition: margin-left 0.3s ease;
         }
 
         .simulation-container {
@@ -101,57 +135,114 @@
         .active {
             background-color: #3498db;
         }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                z-index: 900;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .simulation-image {
+                height: 200px;
+            }
+
+            /* Overlay when sidebar is open */
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 800;
+            }
+
+            .overlay.active {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">
-            <h1>GeoLearn</h1>
-        </div>
-        <div class="menu-section">
-            <div class="menu-title">Basic Geology</div>
-            <ul class="menu-items">
-                <li class="menu-item active" onclick="showSimulation('rocks')">Rock Types</li>
-                <li class="menu-item" onclick="showSimulation('minerals')">Mineral Identification</li>
-                <li class="menu-item" onclick="showSimulation('plate-tectonics')">Plate Tectonics</li>
-                <li class="menu-item" onclick="showSimulation('weathering')">Weathering & Erosion</li>
-            </ul>
-        </div>
-        <div class="menu-section">
-            <div class="menu-title">Intermediate Concepts</div>
-            <ul class="menu-items">
-                <li class="menu-item" onclick="showSimulation('stratigraphy')">Stratigraphy</li>
-                <li class="menu-item" onclick="showSimulation('structural')">Structural Geology</li>
-                <li class="menu-item" onclick="showSimulation('geologic-time')">Geologic Time</li>
-                <li class="menu-item" onclick="showSimulation('fossils')">Fossils & Dating</li>
-            </ul>
-        </div>
-        <div class="menu-section">
-            <div class="menu-title">Advanced Topics</div>
-            <ul class="menu-items">
-                <li class="menu-item" onclick="showSimulation('geophysics')">Geophysics</li>
-                <li class="menu-item" onclick="showSimulation('petrology')">Advanced Petrology</li>
-                <li class="menu-item" onclick="showSimulation('tectonics')">Advanced Tectonics</li>
-                <li class="menu-item" onclick="showSimulation('resources')">Natural Resources</li>
-            </ul>
-        </div>
-    </div>
+    <!-- Header -->
+    <header class="header">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <h1 class="header-title">GeoLearn - Interactive Geology Learning</h1>
+    </header>
 
-    <div class="content">
-        <div class="simulation-container">
-            <h2 class="simulation-title">Rock Types</h2>
-            <div class="simulation-content">
-                <div class="simulation-image">
-                    <img src="/api/placeholder/800/400" alt="Simulation Area">
-                </div>
-                <div class="simulation-description">
-                    <p>Click and drag to rotate the rock sample. Use the buttons below to identify different mineral components and learn about their formation processes.</p>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Overlay for mobile -->
+        <div class="overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="menu-section">
+                <div class="menu-title">Basic Geology</div>
+                <ul class="menu-items">
+                    <li class="menu-item active" onclick="showSimulation('rocks')">Rock Types</li>
+                    <li class="menu-item" onclick="showSimulation('minerals')">Mineral Identification</li>
+                    <li class="menu-item" onclick="showSimulation('plate-tectonics')">Plate Tectonics</li>
+                    <li class="menu-item" onclick="showSimulation('weathering')">Weathering & Erosion</li>
+                </ul>
+            </div>
+            <div class="menu-section">
+                <div class="menu-title">Intermediate Concepts</div>
+                <ul class="menu-items">
+                    <li class="menu-item" onclick="showSimulation('stratigraphy')">Stratigraphy</li>
+                    <li class="menu-item" onclick="showSimulation('structural')">Structural Geology</li>
+                    <li class="menu-item" onclick="showSimulation('geologic-time')">Geologic Time</li>
+                    <li class="menu-item" onclick="showSimulation('fossils')">Fossils & Dating</li>
+                </ul>
+            </div>
+            <div class="menu-section">
+                <div class="menu-title">Advanced Topics</div>
+                <ul class="menu-items">
+                    <li class="menu-item" onclick="showSimulation('geophysics')">Geophysics</li>
+                    <li class="menu-item" onclick="showSimulation('petrology')">Advanced Petrology</li>
+                    <li class="menu-item" onclick="showSimulation('tectonics')">Advanced Tectonics</li>
+                    <li class="menu-item" onclick="showSimulation('resources')">Natural Resources</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content">
+            <div class="simulation-container">
+                <h2 class="simulation-title">Rock Types</h2>
+                <div class="simulation-content">
+                    <div class="simulation-image">
+                        <img src="/api/placeholder/800/400" alt="Simulation Area">
+                    </div>
+                    <div class="simulation-description">
+                        <p>Click and drag to rotate the rock sample. Use the buttons below to identify different mineral components and learn about their formation processes.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
+
         function showSimulation(topic) {
             // Remove active class from all menu items
             document.querySelectorAll('.menu-item').forEach(item => {
@@ -160,6 +251,11 @@
 
             // Add active class to clicked item
             event.target.classList.add('active');
+
+            // Close sidebar on mobile after selection
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
 
             // Update simulation content based on topic
             const titles = {
