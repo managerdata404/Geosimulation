@@ -1,1 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geology E-Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .menu-section {
+            margin: 20px 0;
+        }
+
+        .menu-title {
+            font-size: 1.2em;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .menu-items {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        .menu-item:hover {
+            background-color: #34495e;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #ecf0f1;
+            overflow-y: auto;
+        }
+
+        .simulation-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .simulation-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .simulation-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .simulation-image {
+            width: 100%;
+            height: 300px;
+            background-color: #bdc3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+        }
+
+        .simulation-description {
+            line-height: 1.6;
+        }
+
+        .active {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>GeoLearn</h1>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Basic Geology</div>
+            <ul class="menu-items">
+                <li class="menu-item active" onclick="showSimulation('rocks')">Rock Types</li>
+                <li class="menu-item" onclick="showSimulation('minerals')">Mineral Identification</li>
+                <li class="menu-item" onclick="showSimulation('plate-tectonics')">Plate Tectonics</li>
+                <li class="menu-item" onclick="showSimulation('weathering')">Weathering & Erosion</li>
+            </ul>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Intermediate Concepts</div>
+            <ul class="menu-items">
+                <li class="menu-item" onclick="showSimulation('stratigraphy')">Stratigraphy</li>
+                <li class="menu-item" onclick="showSimulation('structural')">Structural Geology</li>
+                <li class="menu-item" onclick="showSimulation('geologic-time')">Geologic Time</li>
+                <li class="menu-item" onclick="showSimulation('fossils')">Fossils & Dating</li>
+            </ul>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">Advanced Topics</div>
+            <ul class="menu-items">
+                <li class="menu-item" onclick="showSimulation('geophysics')">Geophysics</li>
+                <li class="menu-item" onclick="showSimulation('petrology')">Advanced Petrology</li>
+                <li class="menu-item" onclick="showSimulation('tectonics')">Advanced Tectonics</li>
+                <li class="menu-item" onclick="showSimulation('resources')">Natural Resources</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="simulation-container">
+            <h2 class="simulation-title">Rock Types</h2>
+            <div class="simulation-content">
+                <div class="simulation-image">
+                    <img src="/api/placeholder/800/400" alt="Simulation Area">
+                </div>
+                <div class="simulation-description">
+                    <p>Click and drag to rotate the rock sample. Use the buttons below to identify different mineral components and learn about their formation processes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSimulation(topic) {
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Add active class to clicked item
+            event.target.classList.add('active');
+
+            // Update simulation content based on topic
+            const titles = {
+                'rocks': 'Rock Types',
+                'minerals': 'Mineral Identification',
+                'plate-tectonics': 'Plate Tectonics',
+                'weathering': 'Weathering & Erosion',
+                'stratigraphy': 'Stratigraphy',
+                'structural': 'Structural Geology',
+                'geologic-time': 'Geologic Time',
+                'fossils': 'Fossils & Dating',
+                'geophysics': 'Geophysics',
+                'petrology': 'Advanced Petrology',
+                'tectonics': 'Advanced Tectonics',
+                'resources': 'Natural Resources'
+            };
+
+            const descriptions = {
+                'rocks': 'Click and drag to rotate the rock sample. Use the buttons below to identify different mineral components and learn about their formation processes.',
+                'minerals': 'Examine mineral properties including hardness, streak, and cleavage. Use the virtual tools to perform tests and identify unknown minerals.',
+                'plate-tectonics': 'Interact with this dynamic model of Earth\'s tectonic plates. Observe plate movements and their effects on geological features.',
+                'weathering': 'Simulate different weathering processes and their effects on various rock types over time.',
+                // Add descriptions for other topics as needed
+            };
+
+            document.querySelector('.simulation-title').textContent = titles[topic];
+            document.querySelector('.simulation-description p').textContent = 
+                descriptions[topic] || 'Interactive simulation content for ' + titles[topic];
+        }
+    </script>
+</body>
+</html>
