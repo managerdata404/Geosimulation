@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D Subsurface Cymatics Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .panel {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        #info-panel {
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 2;
+        }
+
+        #controls-panel {
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 350px;
+            transform: translateY(0);
+            z-index: 3;
+            overflow-y: auto;
+        }
+
+        #controls-panel.minimized {
+            transform: translateY(calc(100% - 40px));
+        }
+
+        .minimize-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .slider-container {
+            margin: 10px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        @media (min-width: 768px) {
+            #controls-panel {
+                width: 300px;
+                right: auto;
+                height: calc(100% - 60px);
+                transform: translateX(0);
+            }
+
+            #controls-panel.minimized {
+                transform: translateX(-100%);
+            }
+
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div id="info-panel" class="panel">
+        <div>Active Particles: <span id="particle-count">0</span></div>
+        <div>Layer Depth: <span id="depth-display">3</span></div>
+    </div>
+    <div id="controls-panel" class="panel">
+        <button class="minimize-btn">▼</button>
+        <div class="control-grid">
+            <div class="control-card">
+                <h3>Tectonic Forces</h3>
+                <div class="slider-container">
+                    <label>Force Intensity</label>
+                    <input type="range" id="force-intensity" min="0" max="2" step="0.1" value="1">
+                </div>
+                <div class="slider-container">
+                    <label>Wave Frequency</label>
+                    <input type="range" id="wave-frequency" min="0.1" max="3" step="0.1" value="1">
+                </div>
+            </div>
+            <div class="control-card">
+                <h3>Particle System</h3>
+                <div class="slider-container">
+                    <label>Particle Density</label>
+                    <input type="range" id="particle-density" min="100" max="1000" step="50" value="500">
+                </div>
+                <div class="slider-container">
+                    <label>Particle Size</label>
+                    <input type="range" id="particle-size" min="0.01" max="0.1" step="0.01" value="0.05">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Three.js setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Parameters
+        const params = {
+            forceIntensity: 1,
+            waveFrequency: 1,
+            particleDensity: 500,
+            particleSize: 0.05,
+            time: 0
+        };
+
+        // Create multiple subsurface layers
+        const layers = [];
+        const layerCount = 3;
+        const layerColors = [0x4287f5, 0x42f587, 0xf54242];
+
+        for (let i = 0; i < layerCount; i++) {
+            const geometry = new THREE.PlaneGeometry(20, 20, 50, 50);
+            const material = new THREE.MeshPhongMaterial({
+                color: layerColors[i],
+                transparent: true,
+                opacity: 0.7,
+                side: THREE.DoubleSide,
+                wireframe: true
+            });
+            const layer = new THREE.Mesh(geometry, material);
+            layer.rotation.x = -Math.PI / 2;
+            layer.position.y = -i * 2;
+            scene.add(layer);
+            layers.push(layer);
+        }
+
+        // Particle system
+        const particles = [];
+        const particleGeometry = new THREE.SphereGeometry(1, 8, 8);
+        const particleMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        function createParticles() {
+            // Remove existing particles
+            particles.forEach(p => scene.remove(p));
+            particles.length = 0;
+
+            // Create new particles
+            for (let i = 0; i < params.particleDensity; i++) {
+                const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                particle.scale.setScalar(params.particleSize);
+
+                // Random position within bounds
+                particle.position.x = (Math.random() - 0.5) * 20;
+                particle.position.z = (Math.random() - 0.5) * 20;
+                particle.position.y = -Math.random() * 6; // Distribute across layers
+
+                // Add velocity property
+                particle.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02,
+                    (Math.random() - 0.5) * 0.02
+                );
+
+                scene.add(particle);
+                particles.push(particle);
+            }
+
+            // Update particle count display
+            document.getElementById('particle-count').textContent = particles.length;
+        }
+
+        // Update layer deformation
+        function updateLayers() {
+            layers.forEach((layer, layerIndex) => {
+                const positions = layer.geometry.attributes.position;
+                const count = positions.count;
+
+                for (let i = 0; i < count; i++) {
+                    const x = positions.getX(i);
+                    const z = positions.getZ(i);
+
+                    // Layer-specific wave patterns
+                    const distance = Math.sqrt(x * x + z * z);
+                    const layerPhase = layerIndex * Math.PI / 3;
+                    const wave = Math.sin(distance * params.waveFrequency - params.time + layerPhase) 
+                             * params.forceIntensity 
+                             * (1 - layerIndex * 0.2); // Decreasing amplitude with depth
+
+                    // Add tectonic deformation
+                    const tectonicWave = Math.sin(x * 0.3 + layerPhase) 
+                                     * Math.cos(z * 0.3) 
+                                     * params.forceIntensity 
+                                     * (1 - layerIndex * 0.3);
+
+                    positions.setY(i, wave + tectonicWave);
+                }
+
+                positions.needsUpdate = true;
+                layer.geometry.computeVertexNormals();
+            });
+        }
+
+        // Update particle positions
+        function updateParticles() {
+            particles.forEach(particle => {
+                // Update position based on velocity
+                particle.position.add(particle.velocity);
+
+                // Apply forces based on wave motion
+                const x = particle.position.x;
+                const z = particle.position.z;
+                const distance = Math.sqrt(x * x + z * z);
+
+                // Wave force
+                const waveForce = Math.sin(distance * params.waveFrequency - params.time) 
+                               * params.forceIntensity * 0.01;
+
+                // Tectonic force
+                const tectonicForce = Math.sin(x * 0.3) * Math.cos(z * 0.3) 
+                                  * params.forceIntensity * 0.01;
+
+                particle.velocity.y += (waveForce + tectonicForce);
+
+                // Damping
+                particle.velocity.multiplyScalar(0.98);
+
+                // Boundary checking
+                if (Math.abs(particle.position.x) > 10) particle.velocity.x *= -1;
+                if (Math.abs(particle.position.z) > 10) particle.velocity.z *= -1;
+                if (particle.position.y < -6) particle.velocity.y *= -0.5;
+                if (particle.position.y > 0) particle.velocity.y *= -0.5;
+            });
+        }
+
+        // Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // Camera position
+        camera.position.set(15, 15, 15);
+        camera.lookAt(0, -3, 0);
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            params.time += 0.05;
+            updateLayers();
+            updateParticles();
+            renderer.render(scene, camera);
+        }
+
+        // UI Controls
+        const controlsPanel = document.getElementById('controls-panel');
+        const minimizeBtn = document.querySelector('.minimize-btn');
+
+        minimizeBtn.addEventListener('click', () => {
+            controlsPanel.classList.toggle('minimized');
+            minimizeBtn.textContent = controlsPanel.classList.contains('minimized') ? '▲' : '▼';
+        });
+
+        document.getElementById('force-intensity').addEventListener('input', (e) => {
+            params.forceIntensity = parseFloat(e.target.value);
+        });
+
+        document.getElementById('wave-frequency').addEventListener('input', (e) => {
+            params.waveFrequency = parseFloat(e.target.value);
+        });
+
+        document.getElementById('particle-density').addEventListener('input', (e) => {
+            params.particleDensity = parseInt(e.target.value);
+            createParticles();
+        });
+
+        document.getElementById('particle-size').addEventListener('input', (e) => {
+            params.particleSize = parseFloat(e.target.value);
+            particles.forEach(p => p.scale.setScalar(params.particleSize));
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Initialize particles and start animation
+        createParticles();
+        animate();
+    </script>
+</body>
+</html>
